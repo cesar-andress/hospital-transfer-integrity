@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: Clinical Integrity Verification Service (IVS)
+  version: 0.1.0
+  description: >
+    Contract between Daniel's MVP-Saas (caller) and Alessa's integrity TFG (callee).
+    Stub echoes requests; Alessa replaces the implementation behind the same paths.
+  x-contract-version: 0.1.0
+servers:
+  - url: http://integrity-stub:8090
+    description: Local echo stub (docker compose)
+  - url: http://localhost:8090
+    description: Stub on host
+paths:
+  /v1/health:
+    get:
+      summary: Liveness
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string }
+                  service: { type: string }
+                  contract_version: { type: string }
+  /v1/baselines:
+    post:
+      summary: Register trust baseline for an object
+      parameters:
+        - in: header
+          name: X-Integrity-Token
+          schema: { type: string }
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BaselineRequest"
+      responses:
+        "200":
+          description: Registered or passthrough
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaselineResponse"
+  /v1/verifications:
+    post:
+      summary: Verify object against baseline
+      parameters:
+        - in: header
+          name: X-Integrity-Token
+          schema: { type: string }
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerificationRequest"
+      responses:
+        "200":
+          description: Verdict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationResponse"
+  /v1/reports/{verification_id}:
+    get:
+      summary: Fetch verification report (Alessa)
+      parameters:
+        - in: path
+          name: verification_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Report document
+        "501":
+          description: Not implemented in stub
+components:
+  schemas:
+    ObjectRef:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [file, ehr_record, dicom_study]
+        transfer_id: { type: string, format: uuid }
+        filename: { type: string }
+        media_type: { type: string }
+        size_bytes: { type: integer }
+        sha256: { type: string }
+        clinical:
+          type: object
+          additionalProperties: true
+          description: Free-form clinical metadata for Alessa (ignored by Daniel MVP)
+    BaselineRequest:
+      type: object
+      required: [contract_version, tenant_id, object]
+      properties:
+        contract_version: { type: string, example: "0.1.0" }
+        tenant_id: { type: string }
+        object: { $ref: "#/components/schemas/ObjectRef" }
+        context:
+          type: object
+          additionalProperties: true
+    BaselineResponse:
+      type: object
+      properties:
+        contract_version: { type: string }
+        baseline_id: { type: string }
+        status: { type: string }
+        algorithm: { type: string }
+        registered_at: { type: string, format: date-time }
+        echo:
+          type: object
+          description: Stub only — request echo
+    VerificationRequest:
+      type: object
+      required: [contract_version, tenant_id, object]
+      properties:
+        contract_version: { type: string }
+        tenant_id: { type: string }
+        baseline_id: { type: string }
+        object: { $ref: "#/components/schemas/ObjectRef" }
+        context:
+          type: object
+          additionalProperties: true
+    VerificationResponse:
+      type: object
+      properties:
+        contract_version: { type: string }
+        verification_id: { type: string }
+        baseline_id: { type: string }
+        verdict:
+          type: string
+          enum: [intact, altered, encrypted_or_unreadable, unknown, passthrough]
+        detail: { type: object, additionalProperties: true }
+        checked_at: { type: string, format: date-time }
+        echo: { type: object }

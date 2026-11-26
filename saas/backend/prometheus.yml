@@ -1,0 +1,10 @@
+# Scrape the FastAPI /metrics endpoint from the compose network.
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "fastapi_saas_backend"
+    metrics_path: "/metrics"
+    static_configs:
+      # Prefer the compose service name; host.docker.internal as fallback for host runs.
+      - targets: ["backend:8001", "host.docker.internal:8001"]

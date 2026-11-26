@@ -1,0 +1,16 @@
+# Optional joint stack: real IVS (api/) instead of the SaaS echo stub.
+# Usage (from repo root), after adapting saas/.env:
+#   docker compose -f saas/docker-compose.yml -f docker-compose.joint.yml up --build
+#
+# This file only adds/overrides the integrity service. Keep SaaS own compose as base.
+
+services:
+  api:
+    build: ./api
+    ports:
+      - "8090:8090"
+    environment:
+      IVS_SHARED_TOKEN: ${INTEGRITY_SHARED_TOKEN:-demo-integrity-token}
+      IVS_REQUIRE_TOKEN: ${IVS_REQUIRE_TOKEN:-false}
+      IVS_CONTRACT_VERSION: "0.1.0"
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8090"]

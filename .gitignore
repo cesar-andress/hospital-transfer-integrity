@@ -1,0 +1,59 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+saas/frontend/node_modules/
+dist/
+saas/frontend/dist/
+.vite/
+npm-debug.log*
+yarn-error.log*
+
+# Runtime / local data
+saas/vm_storage/
+saas/storage/
+saas/uploads/
+saas/postgres_data/
+saas/wp_data/
+saas/wp_db_data/
+saas/prometheus_data/
+saas/grafana_data/
+*.sqlite
+*.sqlite3
+*.db
+*.sql.gz
+*.dump
+*.log
+
+# OS / editors (IDE folders only — no agent-tooling entries)
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pyjwt
+prometheus-client
+prometheus-fastapi-instrumentator
+psycopg2-binary
+pydantic
+python-multipart

@@ -1,0 +1,5 @@
+# Test/dev dependencies. Runtime deps stay in requirements.txt (Docker image).
+-r requirements.txt
+pytest>=8
+httpx>=0.27
+pyyaml>=6
