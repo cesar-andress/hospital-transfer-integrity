@@ -4,8 +4,9 @@ One section per GitHub issue. Assign after the collaborators accept the invite.
 
 Labels: `track:saas`, `track:api`, `track:joint`, `boundary`, `mvp`, `ambitious`.
 
-Daniel's issues (D1 to D8) follow the PR plan in `saas/README.md` (PR3 to PR7), `saas/docs/NEXT.md`, and requirements R01–R26.
-**Full coverage map (nothing implicit):** [`DANIEL_SCOPE.md`](DANIEL_SCOPE.md).
+Daniel's issues (D1 to D8): [`DANIEL_SCOPE.md`](DANIEL_SCOPE.md) (R01–R26).  
+Alessa's issues (A1 to A7): [`ALESSA_SCOPE.md`](ALESSA_SCOPE.md) (M0–M5 + proposal).  
+Day-one commands: [`../GETTING_STARTED.md`](../GETTING_STARTED.md).
 
 ## Milestone: MVP, December 2026 (due 2026-12-19)
 
@@ -59,13 +60,29 @@ Requirements R04, R05 and R06.
 
 Assignee: Alessa. Labels: `track:api`, `mvp`.
 
-Replace the in-memory store with durable storage (SQLite is fine for the MVP, Postgres also). Baselines and verifications survive a restart. Tests cover the restart case.
+Replace the in-memory store with durable storage (SQLite is fine for the MVP; Postgres also). Baselines and verifications survive a process restart.
+
+Done when:
+
+- [ ] Store backend is not process-local memory only
+- [ ] Restart (or reopen DB file) still returns the same `baseline_id` / verification
+- [ ] Contract + M1 tests still green; add an explicit restart test
+- [ ] Document how to wipe the store in `api/README.md`
+
+Out of scope: signatures (A3), EHR corpus (A4), SaaS path guards.
 
 ### A2: IVS container and health check for the joint compose
 
 Assignee: Alessa. Labels: `track:api`, `mvp`.
 
-Keep `api/Dockerfile` working, document `make run` and the compose service `api:8090`. The health endpoint returns `service=ivs`.
+Keep `api/Dockerfile` working; document `make run` and compose service `api:8090`. Health returns `service=ivs` and `contract_version=0.1.0`.
+
+Done when:
+
+- [ ] `docker build -t ivs ./api` succeeds
+- [ ] Container serves `/v1/health`
+- [ ] Root `docker-compose.joint.yml` can start `api` (Daniel wires URL in D2)
+- [ ] `make install && make test && make run` documented as the local path
 
 ### J1: Joint happy path script
 
@@ -120,15 +137,24 @@ Done when the matching xfails in `test_tenancy_model.py` and `test_otp_download.
 
 Assignee: Alessa. Labels: `track:api`, `ambitious`.
 
-Sign baselines (for example Ed25519), verify the signature and reject tampered signed payloads.
+Sign baselines (for example Ed25519). Verify signature on check; reject tampered material.
+
+Done when every `TODO(m2)` / xfail in `api/tests/acceptance/test_m2_signatures.py` is gone and green. Document algorithm + key handling briefly in `api/docs/`.
 
 ### A4: M3 synthetic EHR and imaging corpus with attack harness
 
 Assignee: Alessa. Labels: `track:api`, `ambitious`.
 
+1. Fixture corpora under `tests/fixtures/ehr/` and `tests/fixtures/dicom/` (or imaging stand-ins).
+2. Baselines for `kind=ehr_record` and `kind=dicom_study` with `object.clinical` metadata.
+3. Attack harness: bit-flip → `altered`; encrypt-like → `encrypted_or_unreadable`; insider edit → `altered`.
+4. Clear every `TODO(m3)` in `test_m3_ehr_dicom_attacks.py`.
+
 ### A5: First metrics table on the synthetic corpus
 
 Assignee: Alessa. Labels: `track:api`, `ambitious`.
+
+Publish a first metrics table (detection / false positive / time-to-verdict) on the synthetic corpus. May be a script or early `/v1/metrics`; full SIEM + regulatory stay in A6. Must be reproducible from the repo.
 
 ### J2: Contract change drill (one additive clinical field)
 
@@ -160,9 +186,13 @@ Checklist:
 
 Assignee: Alessa. Labels: `track:api`, `ambitious`.
 
+Clear every `TODO(m4)` in `test_m4_metrics_siem.py`: metrics endpoint (or equivalent), breakdown by `object.kind`, `siem_event` on non-intact verdicts, `docs/regulatory.md` (NIS2/GDPR/health-data framing, academic not legal advice), export artifact for the memoir.
+
 ### A7: M5 insider modification case
 
 Assignee: Alessa. Labels: `track:api`, `ambitious`.
+
+Secondary case: unauthorised internal modification by clinical staff role. Document scenario + expected verdicts; automate in tests (may extend M3 insider). Align with joint demo (J3) so the tribunal story is clear.
 
 ### J3: Joint demo for the tribunal
 

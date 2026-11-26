@@ -10,11 +10,12 @@ Public monorepo for two coordinated TFGs under one hospital demo story.
 Tutor / canonical owner: [cesar-andress](https://github.com/cesar-andress).  
 Students fork this repo and open PRs into `main`. Legacy personal repos remain historical; this tree is the source of truth going forward.
 
-## Read first (boundary)
+## Read first
 
-The integration wall is defined once, here. Do not reinvent it in chat.
-
+- **Start:** [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)
 - Boundary: [`docs/architecture/BOUNDARY.md`](docs/architecture/BOUNDARY.md)
+- Daniel scope: [`docs/project/DANIEL_SCOPE.md`](docs/project/DANIEL_SCOPE.md)
+- Alessa scope: [`docs/project/ALESSA_SCOPE.md`](docs/project/ALESSA_SCOPE.md)
 - HTTP contract: [`docs/contract/`](docs/contract/)
 - Calendar: [`docs/ROADMAP.md`](docs/ROADMAP.md) (MVP 2026-12-19, complete 2027-05-15)
 - PR process: [`CONTRIBUTING.md`](CONTRIBUTING.md)

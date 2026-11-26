@@ -1,26 +1,30 @@
 PY ?= .venv/bin/python
 PIP ?= .venv/bin/pip
+STAMP := .venv/.deps-installed
 
 .PHONY: venv install test test-unit test-contract test-acceptance run
 
-venv:
+$(STAMP): requirements-dev.txt requirements.txt
 	python3.12 -m venv .venv
 	$(PIP) install -U pip
 	$(PIP) install -r requirements-dev.txt
+	@touch $(STAMP)
 
-install: venv
+$(PY): $(STAMP)
 
-test:
+venv install: $(STAMP)
+
+test: $(PY)
 	$(PY) -m pytest
 
-test-unit:
+test-unit: $(PY)
 	$(PY) -m pytest -m unit
 
-test-contract:
+test-contract: $(PY)
 	$(PY) -m pytest -m contract
 
-test-acceptance:
+test-acceptance: $(PY)
 	$(PY) -m pytest -m acceptance
 
-run:
+run: $(PY)
 	$(PY) -m uvicorn app.main:app --host 0.0.0.0 --port 8090

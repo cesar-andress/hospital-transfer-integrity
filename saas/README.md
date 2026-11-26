@@ -271,8 +271,8 @@ Acceptance hints:
 ### 6.2 Docker Compose
 
 ```bash
-git clone git@github.com-cesar-andres:cesar-andress/MVP-Saas.git
-cd MVP-Saas
+# From the monorepo checkout (fork of cesar-andress/hospital-transfer-integrity)
+cd saas
 cp .env.example .env
 docker compose up --build
 ```
@@ -309,25 +309,12 @@ docker compose down -v    # wipe DB + demo data
 
 See [`.env.example`](.env.example). Change `SECRET_KEY` outside demo.
 
-### 6.6 Git remotes
+### 6.6 Git
 
-```bash
-# origin   = this fork (cesar-andress)
-# upstream = student (dani84mol)
-git remote -v
-git fetch upstream
-```
-
-Suggested SSH host:
-
-```text
-Host github.com-cesar-andres
-  HostName github.com
-  User git
-  IdentityFile ~/.ssh/id_rsa_ucjc
-```
-
-Clone with `git@github.com-cesar-andres:cesar-andress/MVP-Saas.git` (plain `git@github.com:` may hit another account).
+Canonical monorepo: `cesar-andress/hospital-transfer-integrity`.  
+Fork it, clone your fork, open PRs to `main`. Work under `saas/`.  
+Scope map: [`../docs/project/DANIEL_SCOPE.md`](../docs/project/DANIEL_SCOPE.md).  
+Getting started: [`../docs/GETTING_STARTED.md`](../docs/GETTING_STARTED.md).
 
 ### 6.7 Tests
 

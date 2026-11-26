@@ -1,33 +1,29 @@
 # Next steps (for Alessa)
 
-## Current milestone
+Work in monorepo package `api/`. Fork `cesar-andress/hospital-transfer-integrity`, PRs to `main`.
 
-| Field | Value |
-|-------|--------|
-| Now | Land M0/M1 skeleton from the tutor PR, run tests, replace in-memory store when ready |
-| Clear | Every `TODO(m2)` ... `TODO(m5)` over time, start with M2 signatures |
-| Do not | Implement Daniel's SaaS features here |
+| Doc | Link |
+|-----|------|
+| Full scope | [`../../docs/project/ALESSA_SCOPE.md`](../../docs/project/ALESSA_SCOPE.md) |
+| Issues | [`../../docs/project/ISSUES.md`](../../docs/project/ISSUES.md) |
+| Getting started | [`../../docs/GETTING_STARTED.md`](../../docs/GETTING_STARTED.md) |
+| Boundary | [`../../docs/architecture/BOUNDARY.md`](../../docs/architecture/BOUNDARY.md) |
+
+## Now (MVP)
+
+1. **A1** durable store (replace memory).  
+2. **A2** container + health for joint compose.  
+3. **B0** ACK boundary.  
+4. **J1** with Daniel when both sides ready.
 
 ```bash
-python3.12 -m venv .venv
-.venv/bin/pip install -r requirements-dev.txt
-make test
-make run   # http://localhost:8090/v1/health
+cd api && make install && make test && make run
 ```
 
-Find remaining work:
+## After MVP (ordered)
 
-```bash
-rg 'TODO\(m[2-5]\)' tests/ docs/ app/ || true
-```
-
-## Ordered after M1
-
-1. M2, sign baselines; verify signature; reject tampered signed payloads.
-2. M3, synthetic EHR + DICOM (or stand-ins); attack scripts (flip / encrypt / insider edit).
-3. M4, metrics on the corpus; SIEM-shaped event when verdict is not intact; regulatory note in `docs/`.
-4. M5, schedule URL-swap demo with Daniel.
-
-## Boundary reminder
-
-You own IVS. Daniel owns transfer SaaS. Only HTTP + contract ids cross the wall, see [`BOUNDARY.md`](BOUNDARY.md).
+1. **A3** signatures (`TODO(m2)`).  
+2. **A4** EHR/imaging + attacks (`TODO(m3)`).  
+3. **A5** first metrics table.  
+4. **A6** SIEM + regulatory (`TODO(m4)`).  
+5. **A7** insider case + **J3/J4** joint demo / evaluation pack.
