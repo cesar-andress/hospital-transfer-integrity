@@ -13,7 +13,7 @@ Auth for demos: shared header `X-Integrity-Token: <INTEGRITY_SHARED_TOKEN>` (opt
 
 Register a trust baseline when a file (or clinical record payload) is first accepted.
 
-**Request**
+Request
 
 ```json
 {
@@ -34,9 +34,9 @@ Register a trust baseline when a file (or clinical record payload) is first acce
 }
 ```
 
-`object.kind` for Alessa’s TFG will also include `ehr_record` and `dicom_study` (optional fields under `object.clinical` — see OpenAPI). Daniel’s MVP may only send `kind=file` + hash.
+`object.kind` for Alessa's TFG will also include `ehr_record` and `dicom_study` (optional fields under `object.clinical`, see OpenAPI). Daniel's MVP may only send `kind=file` + hash.
 
-**Response (Alessa target)**
+Response (Alessa target)
 
 ```json
 {
@@ -48,13 +48,13 @@ Register a trust baseline when a file (or clinical record payload) is first acce
 }
 ```
 
-**Stub behaviour:** echo request under `echo`, invent `baseline_id`, `status=passthrough`.
+Stub behaviour: echo request under `echo`, invent `baseline_id`, `status=passthrough`.
 
 ### `POST /v1/verifications`
 
 Verify an object against a baseline (post-incident / on-demand).
 
-**Request**
+Request
 
 ```json
 {
@@ -73,7 +73,7 @@ Verify an object against a baseline (post-incident / on-demand).
 }
 ```
 
-**Response (Alessa target)**
+Response (Alessa target)
 
 ```json
 {
@@ -92,7 +92,7 @@ Verify an object against a baseline (post-incident / on-demand).
 
 `verdict` enum (Alessa fills meaning): `intact` | `altered` | `encrypted_or_unreadable` | `unknown` | `passthrough`.
 
-**Stub behaviour:** `verdict=passthrough`, echo body.
+Stub behaviour: `verdict=passthrough`, echo body.
 
 ### `GET /v1/health`
 

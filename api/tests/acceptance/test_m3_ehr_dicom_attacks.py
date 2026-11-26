@@ -1,4 +1,4 @@
-"""M3 — synthetic EHR/DICOM corpus and attack harness.
+"""M3: synthetic EHR/DICOM corpus and attack harness.
 
 TODO(m3): load clinical fixtures, mutate them (flip / encrypt / insider edit),
 and assert veredicts. Remove every TODO(m3) and xfail when green.
@@ -68,7 +68,7 @@ def test_attack_bit_flip_marks_altered(client, sha_a, sha_b):
     assert vr["detail"].get("attack_class") == "bit_flip"
 
 
-@pytest.mark.xfail(reason="TODO(m3): encryption/ransomware-like attack → encrypted_or_unreadable")
+@pytest.mark.xfail(reason="TODO(m3): encryption/ransomware-like attack gives encrypted_or_unreadable")
 def test_attack_encryption_marks_encrypted_or_unreadable(client, sha_a):
     bl = client.post("/v1/baselines", json=baseline_body(sha=sha_a)).json()
     body = verify_body(sha=sha_a, baseline_id=bl["baseline_id"])
@@ -82,7 +82,7 @@ def test_attack_encryption_marks_encrypted_or_unreadable(client, sha_a):
     assert vr["verdict"] == "encrypted_or_unreadable"
 
 
-@pytest.mark.xfail(reason="TODO(m3): insider edit (content change, same id) → altered")
+@pytest.mark.xfail(reason="TODO(m3): insider edit (content change, same id) gives altered")
 def test_attack_insider_edit_marks_altered(client, sha_a, sha_b):
     bl = client.post(
         "/v1/baselines",

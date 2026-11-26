@@ -1,4 +1,4 @@
-"""M4 — metrics table, SIEM-shaped export, regulatory note.
+"""M4: metrics table, SIEM-shaped export, regulatory note.
 
 TODO(m4): implement metrics aggregation and SIEM event payloads.
 Remove every TODO(m4) and xfail when green.

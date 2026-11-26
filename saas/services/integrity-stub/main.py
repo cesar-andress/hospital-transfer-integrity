@@ -1,4 +1,4 @@
-"""Echo Integrity Verification Service — replace with Alessa's IVS behind the same paths."""
+"""Echo Integrity Verification Service. Replace with Alessa's IVS behind the same paths."""
 
 from datetime import datetime, timezone
 from uuid import uuid4

@@ -49,7 +49,7 @@ saas/grafana_data/
 *.dump
 *.log
 
-# OS / editors (IDE folders only — no agent-tooling entries)
+# OS / editors (IDE folders only, no agent-tooling entries)
 .DS_Store
 Thumbs.db
 desktop.ini

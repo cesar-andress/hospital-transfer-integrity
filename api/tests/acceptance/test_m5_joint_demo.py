@@ -1,4 +1,4 @@
-"""M5 — joint demo with Daniel (URL swap, no code merge).
+"""M5: joint demo with Daniel (URL swap, no code merge).
 
 TODO(m5): document and automate the dual-stack demo checklist.
 Remove every TODO(m5) and xfail when green.
@@ -31,7 +31,7 @@ def test_health_exposes_demo_identity(client):
 
 
 @pytest.mark.xfail(
-    reason="TODO(m5): end-to-end fixture mirroring Daniel transfer_id → baseline → verify → report"
+    reason="TODO(m5): end-to-end fixture mirroring Daniel transfer_id, baseline, verify, report"
 )
 def test_joint_flow_preserves_transfer_id(client, sha_a):
     transfer_id = "550e8400-e29b-41d4-a716-446655440000"

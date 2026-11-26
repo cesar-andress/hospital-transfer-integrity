@@ -15,7 +15,7 @@ pytestmark = [
 
 
 def _import_storage_paths():
-    # TODO(path-guards): module missing today — tests stay xfail until it exists
+    # TODO(path-guards): module missing today, tests stay xfail until it exists
     from app import storage_paths
 
     return storage_paths

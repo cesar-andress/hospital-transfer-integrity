@@ -1,10 +1,10 @@
-> **Monorepo note.** This package lives in `cesar-andress/hospital-transfer-integrity` under `saas/`. Canonical boundary: [`../docs/architecture/BOUNDARY.md`](../docs/architecture/BOUNDARY.md). Fork the monorepo and open PRs to `main`.
+> Monorepo note. This package lives in `cesar-andress/hospital-transfer-integrity` under `saas/`. Canonical boundary: [`../docs/architecture/BOUNDARY.md`](../docs/architecture/BOUNDARY.md). Fork the monorepo and open PRs to `main`.
 
-# MVP SaaS — multi-tenant secure file transfer
+# MVP SaaS: multi-tenant secure file transfer
 
 Working doc for this TFG fork: what the product is, what ships today, what is still open, and how to run it.
 
-Each company (tenant) gets one isolated “VM” (a private filesystem root today; a real Linux VM later), N users on that same VM, one shared front end, OTP download links that only read from the owning tenant’s VM, and SaaS credits that should burn on **upload and download**. WooCommerce provisions tenants; Prometheus/Grafana cover basic observability.
+Each company (tenant) gets one isolated "VM" (a private filesystem root today; a real Linux VM later), N users on that same VM, one shared front end, OTP download links that only read from the owning tenant's VM, and SaaS credits that should burn on upload and download. WooCommerce provisions tenants; Prometheus/Grafana cover basic observability.
 
 | Role | GitHub |
 |------|--------|
@@ -34,12 +34,12 @@ Status labels used below:
 
 | Label | Meaning |
 |-------|---------|
-| **Done** | In `main` (or documented as finished). |
-| **In progress** | Branch / open work, not finished. |
-| **Todo** | Planned, no code yet. |
-| **Deferred** | Known, out of TFG scope for now. |
+| Done | In `main` (or documented as finished). |
+| In progress | Branch / open work, not finished. |
+| Todo | Planned, no code yet. |
+| Deferred | Known, out of TFG scope for now. |
 
-All docs, comments, and commit messages in this fork stay in **English**.
+All docs, comments, and commit messages in this fork stay in English.
 
 ---
 
@@ -47,18 +47,18 @@ All docs, comments, and commit messages in this fork stay in **English**.
 
 ### 1.1 What it is
 
-A company signs up (WooCommerce or SuperAdmin), gets an isolated environment, and its staff send files to outsiders with expiry and an audit trail. The recipient opens a link, types an OTP, and downloads — no account required.
+A company signs up (WooCommerce or SuperAdmin), gets an isolated environment, and its staff send files to outsiders with expiry and an audit trail. The recipient opens a link, types an OTP, and downloads, no account required.
 
 ### 1.2 Product rules
 
-1. **Sign-up.** Woo webhook or SuperAdmin. A second purchase for the same CIF/email **tops up** the plan; it never creates a second VM.
-2. **One VM per company.** Today: directory under `STORAGE_BASE_PATH` (`tenants.vm_storage_path`). End state: real Linux VM per tenant ([PR7](#5-pr-plan)).
-3. **N users, one VM.** Everyone in the tenant shares that storage. Cap is `max_accounts`. No per-user disks.
-4. **Shared front.** One React/Vite SPA. Isolation comes from login (`tenant_id` → JWT) and, later, nginx Host routing ([PR5](#5-pr-plan)).
-5. **OTP links stay inside the owner VM.** A transfer id from tenant A must never serve bytes from tenant B, or escape A’s storage root.
-6. **Credits.** Burn on upload **and** download. Today we only cap stored transfer count on upload; a real ledger is [PR4](#5-pr-plan).
-7. **WooCommerce.** Sells plans; webhook creates tenant + owner + VM, or tops up an existing one.
-8. **Observability.** Prometheus + Grafana (HTTP metrics and per-tenant quota leftovers).
+1. Sign-up. Woo webhook or SuperAdmin. A second purchase for the same CIF/email tops up the plan; it never creates a second VM.
+2. One VM per company. Today: directory under `STORAGE_BASE_PATH` (`tenants.vm_storage_path`). End state: real Linux VM per tenant ([PR7](#5-pr-plan)).
+3. N users, one VM. Everyone in the tenant shares that storage. Cap is `max_accounts`. No per-user disks.
+4. Shared front. One React/Vite SPA. Isolation comes from login (`tenant_id` in the JWT) and, later, nginx Host routing ([PR5](#5-pr-plan)).
+5. OTP links stay inside the owner VM. A transfer id from tenant A must never serve bytes from tenant B, or escape A's storage root.
+6. Credits. Burn on upload and download. Today we only cap stored transfer count on upload; a real ledger is [PR4](#5-pr-plan).
+7. WooCommerce. Sells plans; webhook creates tenant + owner + VM, or tops up an existing one.
+8. Observability. Prometheus + Grafana (HTTP metrics and per-tenant quota leftovers).
 
 ### 1.3 Actors
 
@@ -74,15 +74,15 @@ A company signs up (WooCommerce or SuperAdmin), gets an isolated environment, an
 
 ```text
  1. Company buys a plan on tienda.saas.local
- 2. Signed webhook → API creates tenant + owner + VM
+ 2. Signed webhook -> API creates tenant + owner + VM
  3. Activation mail with set-password link (no cleartext password)
- 4. Owner logs into the shared SPA → JWT {tenant_id, role}
+ 4. Owner logs into the shared SPA -> JWT {tenant_id, role}
  5. Owner invites users (≤ max_accounts); all share the VM
- 6. User uploads → bytes only under that VM → −1 credit
- 7. API builds transfer + OTP + expiry → mail to recipient
- 8. Recipient opens link → OTP → read only from owner VM → −1 credit → audit_logs
+ 6. User uploads -> bytes only under that VM -> −1 credit
+ 7. API builds transfer + OTP + expiry -> mail to recipient
+ 8. Recipient opens link -> OTP -> read only from owner VM -> −1 credit -> audit_logs
  9. Grafana shows usage / remaining credits per tenant
-10. Same company buys again → more credits, same VM
+10. Same company buys again -> more credits, same VM
 ```
 
 ---
@@ -92,25 +92,25 @@ A company signs up (WooCommerce or SuperAdmin), gets an isolated environment, an
 ### 2.1 Today (`main`)
 
 ```text
-                       ┌───────────────────────┐
-   *.saas.local ─────► │  Nginx (by service)   │   not by tenant
-                       └───────────┬───────────┘
-        ┌───────────────┬──────────┼───────────────┬───────────────┐
-        ▼               ▼          ▼               ▼               ▼
+                       +-----------------------+
+   *.saas.local -----> |  Nginx (by service)   |   not by tenant
+                       +-----------+-----------+
+        +---------------+----------+---------------+---------------+
+        v               v          v               v               v
    app.saas.local  api.saas.local  shop         grafana         mail
    SPA :5173       FastAPI :8001   WP+Woo       :3000           MailHog
-                       │
-      ┌────────────────┼──────────────────────┐
-      ▼                ▼                      ▼
+                       |
+      +----------------+----------------------+
+      v                v                      v
   PostgreSQL        SMTP sink            vm_storage/
-  tenants,users,                         ├── tenant_a/   ← "VM" = folder
-  transfers,                             └── <tenant_id>/
+  tenants,users,                         +-- tenant_a/   <- "VM" = folder
+  transfers,                             +-- <tenant_id>/
   audit_logs
 ```
 
 What that means in practice:
 
-- One API process writes local disk; “VM” = `vm_storage/<tenant_id>/`.
+- One API process writes local disk; "VM" = `vm_storage/<tenant_id>/`.
 - Isolation = JWT `tenant_id` + SQL filters + that folder.
 - Login asks for `tenant_id` (plus demo `admin`).
 - Quota = row count in `transfers`; checked on upload only.
@@ -121,18 +121,18 @@ What that means in practice:
 ### 2.2 Target
 
 ```text
-  alfa.app.saas.local ─┐
-  beta.app.saas.local ─┼─► nginx (TLS, host→tenant, rate limits)
-  api.saas.local ──────┘         │
-                                 ▼
+  alfa.app.saas.local -+
+  beta.app.saas.local -+-> nginx (TLS, host->tenant, rate limits)
+  api.saas.local ------+         |
+                                 v
                     Shared SPA + API
                     JWT tenant must match Host
                     credit ledger; path guards
-                         │
-            ┌────────────┴────────────┐
-            ▼                         ▼
+                         |
+            +------------+------------+
+            v                         v
        PostgreSQL              VM orchestrator
-       tenants, vms,           └── one Linux VM / tenant
+       tenants, vms,           +-- one Linux VM / tenant
        users, credits,             (file agent: put/get/delete)
        transfers, audit
 ```
@@ -142,7 +142,7 @@ What that means in practice:
 | Layer | Today | Missing |
 |-------|-------|---------|
 | Provisioning | Admin + Woo create tenant/owner/dir | HMAC webhook, set-password mail, `vms` table |
-| “VM” | Folder | Path guards, `vms` row, then real Linux VM |
+| "VM" | Folder | Path guards, `vms` row, then real Linux VM |
 | Users | N users in DB | Invite API, enforce `max_accounts` |
 | Front | One SPA, tenant typed at login | Host-based tenant |
 | Routing | nginx by service | nginx by tenant, Host == JWT |
@@ -164,8 +164,8 @@ Past dates come from `git log`. Future weeks are planning guesses.
 | 2026-11-18 | Done | Student upstream: first commits (`47d42d2`, `db9341f`) |
 | 2026-11-20 | Done | Product audit vs code; PR1 docs/schema/cleanup on fork (`2b68c73`) |
 | 2026-11-20 | Done | PR2 test suite + docs branches prepared on the fork |
-| 2026-11-23 | Done | Student merged PRs **#1, #2, #3** into `dani84mol/main`; tags `v0.1.0`–`v0.1.4` |
-| 2026-11-23 | Done | Follow-up commit on upstream README (left merge conflict markers — fixed in this branch) |
+| 2026-11-23 | Done | Student merged PRs #1, #2, #3 into `dani84mol/main`; tags `v0.1.0`-`v0.1.4` |
+| 2026-11-23 | Done | Follow-up commit on upstream README (left merge conflict markers, fixed in this branch) |
 | 2026-11-24 | In progress | English README rewrite + sync fork `main` with upstream |
 
 ### 3.2 Next (proposed)
@@ -173,56 +173,56 @@ Past dates come from `git log`. Future weeks are planning guesses.
 | Window | Status | Work | PR |
 |--------|--------|------|----|
 | 2026-11-24 | In progress | English docs; clear leftover merge junk | this branch |
-| 2026-11-30 → 12-11 | Todo | FS guards + `vms` table + `max_accounts` | PR3 |
-| 2026-12-14 → 12-23 | Todo | Credit ledger; debit upload **and** download | PR4 |
-| 2027-01-11 → 01-22 | Todo | Tenant Host routing in nginx | PR5 |
-| 2027-01-25 → 02-12 | Todo | Password hash, webhook HMAC, OTP lockout | PR6 |
-| 2027-02-15 → 03-26 | Todo | Real Linux VM per tenant | PR7 |
-| Later | Deferred | Byte quotas, fancy billing, HA, managed TLS | — |
+| 2026-11-30 to 12-11 | Todo | FS guards + `vms` table + `max_accounts` | PR3 |
+| 2026-12-14 to 12-23 | Todo | Credit ledger; debit upload and download | PR4 |
+| 2027-01-11 to 01-22 | Todo | Tenant Host routing in nginx | PR5 |
+| 2027-01-25 to 02-12 | Todo | Password hash, webhook HMAC, OTP lockout | PR6 |
+| 2027-02-15 to 03-26 | Todo | Real Linux VM per tenant | PR7 |
+| Later | Deferred | Byte quotas, fancy billing, HA, managed TLS | - |
 
 ```text
-PR1 docs → PR2 tests → PR3 FS/vms → PR4 credits → PR5 routing → PR6 security → PR7 Linux VM
- (merged)   (merged)     ▲_____________________ enables real VM swap _________________▲
+PR1 docs -> PR2 tests -> PR3 FS/vms -> PR4 credits -> PR5 routing -> PR6 security -> PR7 Linux VM
+ (merged)   (merged)     ^_____________________ enables real VM swap _________________^
 ```
 
 ---
 
 ## 4. Requirements matrix
 
-Audit of 2026-11-20, updated after the Nov 23 merges. “Test” = acceptance suite / `xfail` where noted.
+Audit of 2026-11-20, updated after the Nov 23 merges. "Test" = acceptance suite / `xfail` where noted.
 
 | # | Requirement | Status | Gap | PR |
 |---|-------------|--------|-----|----|
-| R01 | Admin can create companies | Done | — | — |
+| R01 | Admin can create companies | Done | - | - |
 | R02 | Woo auto-provision | Done (demo) | No signature | PR6 |
 | R03 | Second purchase tops up same CIF | Done | Still bumps `quota_limit`, not a ledger | PR4 |
 | R04 | One VM per tenant | Done as FS | No `vms` table | PR3 / PR7 |
 | R05 | N users, one VM | Partial | No invite API / `max_accounts` check | PR3 |
 | R06 | Owner invites peers | Todo | No `/app/users` | PR3 |
 | R07 | FS isolation | Partial | Need path sanitize + base-path check | PR3 |
-| R08 | Shared front | Done | — | — |
-| R09 | Login isolation (JWT tenant) | Done | — | — |
+| R08 | Shared front | Done | - | - |
+| R09 | Login isolation (JWT tenant) | Done | - | - |
 | R10 | nginx Host isolation | Todo | Service Hosts only | PR5 |
 | R11 | OTP only against owner VM | Partial | Need path guard + attempt limits | PR3 / PR6 |
 | R12 | Credits on upload | Partial | Count-based quota | PR4 |
 | R13 | Credits on download | Todo | Download is free today | PR4 |
-| R14 | Auditable credit ledger | Todo | — | PR4 |
-| R15 | Woo tops up credits | Todo | — | PR4 |
+| R14 | Auditable credit ledger | Todo | - | PR4 |
+| R15 | Woo tops up credits | Todo | - | PR4 |
 | R16 | Prometheus / Grafana | Done (base) | Credit/VM metrics later | PR4 / PR7 |
 | R17 | Password hashing | Todo | Plaintext in DB | PR6 |
-| R18 | Activation without cleartext password | Todo | — | PR6 |
-| R19 | Signed webhook | Todo | — | PR6 |
-| R20 | SuperAdmin not hard-coded | Todo | — | PR6 |
+| R18 | Activation without cleartext password | Todo | - | PR6 |
+| R19 | Signed webhook | Todo | - | PR6 |
+| R20 | SuperAdmin not hard-coded | Todo | - | PR6 |
 | R21 | `audit_logs` | Done (base) | Broader coverage later | PR4 / PR6 |
-| R22 | Automated tests | Done | Suite on `main`; many `xfail` | — |
-| R23 | Product docs | Done | Keep English | — |
+| R22 | Automated tests | Done | Suite on `main`; many `xfail` | - |
+| R23 | Product docs | Done | Keep English | - |
 | R24 | Real Linux VM | Todo | Folder only | PR7 |
-| R25 | Byte quotas | Deferred | — | — |
-| R26 | Managed TLS / custom domains | Deferred | — | — |
+| R25 | Byte quotas | Deferred | - | - |
+| R26 | Managed TLS / custom domains | Deferred | - | - |
 
 Executable detail: [`docs/SPEC.md`](docs/SPEC.md).  
 What to do this week: [`docs/NEXT.md`](docs/NEXT.md).  
-Split with the integrity TFG (**Alessa Renata Comparini Ceroni**): [`docs/integration/OVERVIEW.md`](docs/integration/OVERVIEW.md).
+Split with the integrity TFG (Alessa Renata Comparini Ceroni): [`docs/integration/OVERVIEW.md`](docs/integration/OVERVIEW.md).
 
 ---
 
@@ -232,19 +232,19 @@ Small PRs, one theme each.
 
 | PR | Theme | Status |
 |----|-------|--------|
-| **#1** | Docs / `init_db` fix / dead code | Merged upstream 2026-11-23 |
-| **#2** | Large README + roadmap | Merged (was Spanish — this branch puts it in English) |
-| **#3** | Pytest living spec | Merged |
-| **PR3** | FS guards + `vms` + invites / `max_accounts` | Todo |
-| **PR4** | Credits ledger (upload + download) | Todo |
-| **PR5** | Tenant Host routing | Todo |
-| **PR6** | Security hardening | Todo |
-| **PR7** | Real Linux VM | Todo |
+| #1 | Docs / `init_db` fix / dead code | Merged upstream 2026-11-23 |
+| #2 | Large README + roadmap | Merged (was Spanish, this branch puts it in English) |
+| #3 | Pytest living spec | Merged |
+| PR3 | FS guards + `vms` + invites / `max_accounts` | Todo |
+| PR4 | Credits ledger (upload + download) | Todo |
+| PR5 | Tenant Host routing | Todo |
+| PR6 | Security hardening | Todo |
+| PR7 | Real Linux VM | Todo |
 
 Acceptance hints:
 
 - PR3: path-traversal xfails go green; `vms` migration exists.
-- PR4: upload and download each cost 1 credit; empty balance → 402/403; ledger matches balance.
+- PR4: upload and download each cost 1 credit; empty balance returns 402/403; ledger matches balance.
 - PR5: `alfa.app…` with a `tenant_b` JWT is rejected.
 - PR6: hashed passwords, signed webhook, no password in mail.
 - PR7: create/destroy VM; I/O via the VM agent.
@@ -301,8 +301,8 @@ docker compose down -v    # wipe DB + demo data
 1. Login as Alfa, upload with a recipient.
 2. Open MailHog, grab link + OTP.
 3. Download in another window.
-4. Login as the other Alfa user — same files (same VM).
-5. Login as Beta — no Alfa files.
+4. Login as the other Alfa user, same files (same VM).
+5. Login as Beta, no Alfa files.
 6. SuperAdmin: create a tenant; check `vm_storage/`.
 
 ### 6.5 Env
@@ -364,20 +364,20 @@ cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements-dev
 ### 7.2 Target shape
 
 ```text
- tenants 1───1 vms
-    │───N users
-    │───1 credit_accounts 1───N credit_ledger
-    │───N transfers
-    └───N audit_logs
+ tenants 1---1 vms
+    |---N users
+    |---1 credit_accounts 1---N credit_ledger
+    |---N transfers
+    +---N audit_logs
 ```
 
-**`vms`:** one row per tenant (`UNIQUE tenant_id`), `kind` = `fs` | `linux`, `storage_root` or host/agent fields, `status`.
+`vms`: one row per tenant (`UNIQUE tenant_id`), `kind` = `fs` | `linux`, `storage_root` or host/agent fields, `status`.
 
-**`credit_accounts` / `credit_ledger`:** balance + append-only deltas (`upload`, `download`, `purchase`, …) with `idempotency_key`. Balance must equal `SUM(delta)` per tenant; debit in the same transaction as the transfer/download.
+`credit_accounts` / `credit_ledger`: balance + append-only deltas (`upload`, `download`, `purchase`, ...) with `idempotency_key`. Balance must equal `SUM(delta)` per tenant; debit in the same transaction as the transfer/download.
 
-**`transfers`:** store a path **relative** to the VM root (`file_key`), hashed OTP, attempt counter — never a raw host absolute path from the client.
+`transfers`: store a path relative to the VM root (`file_key`), hashed OTP, attempt counter, never a raw host absolute path from the client.
 
-**`users`:** `password_hash`, roles `owner` | `user`, enforce `max_accounts` on insert.
+`users`: `password_hash`, roles `owner` | `user`, enforce `max_accounts` on insert.
 
 ### 7.3 Hard rules
 
@@ -407,8 +407,8 @@ cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements-dev
 1. No cross-tenant read/list/delete/download. Scope from JWT `tenant_id`, never from a client-supplied id alone.
 2. No filesystem escape outside the tenant VM root.
 3. No real secrets in git (`.env` ignored; `.env.example` only).
-4. Disabled tenant → access gone immediately.
-5. OTP downloads only serve the owning tenant’s VM.
+4. A disabled tenant loses access immediately.
+5. OTP downloads only serve the owning tenant's VM.
 
 ### 8.3 Before any real deploy
 
@@ -429,7 +429,7 @@ cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements-dev
 - Fork maintainer: César Andrés `<cesar.andress@ucjc.edu>` / [cesar-andress](https://github.com/cesar-andress).
 - Upstream: [dani84mol](https://github.com/dani84mol).
 - The exam board does not grade GitHub history; tutoring commits on this fork are fine.
-- **English** for docs, comments, and commit messages.
+- English for docs, comments, and commit messages.
 
 See [`AUTHORS.md`](AUTHORS.md).
 
@@ -440,7 +440,7 @@ See [`AUTHORS.md`](AUTHORS.md).
 | Term | Meaning |
 |------|---------|
 | Tenant | Customer company (`tenant_id`, `cif_nif`). |
-| VM | Tenant runtime + storage. **Now** = isolated folder. **Later** = Linux VM (PR7). |
+| VM | Tenant runtime + storage. Now = isolated folder. Later = Linux VM (PR7). |
 | Shared front | One SPA for every tenant. |
 | Host routing | nginx picks tenant from hostname (PR5). |
 | OTP link | Download URL + code; must resolve inside owner VM. |
@@ -458,17 +458,17 @@ See [`AUTHORS.md`](AUTHORS.md).
 
 ```text
 MVP-Saas/
-├── docker-compose.yml
-├── nginx.conf
-├── Makefile
-├── .env.example
-├── AUTHORS.md
-├── docs/SPEC.md
-├── backend/
-│   ├── scripts/init_db.sql
-│   ├── tests/                 # unit + acceptance
-│   └── app/                   # FastAPI
-└── frontend/src/              # Vite SPA
++-- docker-compose.yml
++-- nginx.conf
++-- Makefile
++-- .env.example
++-- AUTHORS.md
++-- docs/SPEC.md
++-- backend/
+|   +-- scripts/init_db.sql
+|   +-- tests/                 # unit + acceptance
+|   +-- app/                   # FastAPI
++-- frontend/src/              # Vite SPA
 ```
 
 ### 11.2 API surface
@@ -488,7 +488,7 @@ Interactive docs: `http://api.saas.local/docs`
 - Start from [`docs/NEXT.md`](docs/NEXT.md).
 - One theme per PR.
 - Prefer flipping an `xfail` when you ship a feature.
-- Quota today counts **files stored**, not bytes.
+- Quota today counts files stored, not bytes.
 
 ### 11.4 License
 

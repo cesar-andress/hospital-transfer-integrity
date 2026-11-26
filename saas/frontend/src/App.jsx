@@ -109,7 +109,7 @@ export default function App() {
           }
         />
 
-        {/* Public OTP download — keep before the catch-all */}
+        {/* Public OTP download: keep before the catch-all */}
         <Route path="/download/:transferId" element={<DownloadPage />} />
 
         <Route

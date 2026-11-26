@@ -1,7 +1,7 @@
-"""Integrity Verification Service — contract v0.1.0 (M0/M1 skeleton).
+"""Integrity Verification Service, contract v0.1.0 (M0/M1 skeleton).
 
 Daniel's MVP-Saas calls these paths. Later milestones add signatures, EHR/DICOM
-cases, attack simulation, metrics and SIEM export — see docs/PLANNING.md.
+cases, attack simulation, metrics and SIEM export. See docs/PLANNING.md.
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ SHARED_TOKEN = os.getenv("IVS_SHARED_TOKEN", "")
 app = FastAPI(
     title="Clinical Integrity Verification Service (IVS)",
     version=CONTRACT,
-    description="Alessa Renata Comparini Ceroni — callee for Daniel's MVP-Saas",
+    description="Alessa Renata Comparini Ceroni, callee for Daniel's MVP-Saas",
 )
 
 

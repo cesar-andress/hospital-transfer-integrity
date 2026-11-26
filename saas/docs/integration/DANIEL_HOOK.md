@@ -1,6 +1,6 @@
-# Daniel — how to call Alessa’s integrity service
+# Daniel: how to call Alessa's integrity service
 
-You keep building the transfer SaaS ([`docs/NEXT.md`](../NEXT.md)). Integrity is **not** your thesis core; you only call a remote API.
+You keep building the transfer SaaS ([`docs/NEXT.md`](../NEXT.md)). Integrity is not your thesis core; you only call a remote API.
 
 ## What already exists in this repo
 
@@ -9,11 +9,11 @@ You keep building the transfer SaaS ([`docs/NEXT.md`](../NEXT.md)). Integrity is
 | `services/integrity-stub/` | Tiny echo server (same paths as the contract). |
 | `backend/app/integrity_client.py` | HTTP client + local fallback. |
 | Compose service `integrity-stub` | Started with the stack. |
-| Env `INTEGRITY_API_BASE_URL` | Default `http://integrity-stub:8090`. Empty / unreachable → soft-fail, upload continues. |
-| Env `INTEGRITY_ENABLED` | `true`/`false` — kill switch. |
+| Env `INTEGRITY_API_BASE_URL` | Default `http://integrity-stub:8090`. If it is empty or unreachable the call soft-fails and the upload continues. |
+| Env `INTEGRITY_ENABLED` | `true`/`false`, kill switch. |
 | Env `INTEGRITY_SHARED_TOKEN` | Sent as `X-Integrity-Token`. |
 
-On successful upload (when enabled), the API **registers a baseline** with the stub/IVS and writes an audit line. It must **not** break uploads if IVS is down.
+On successful upload (when enabled), the API registers a baseline with the stub/IVS and writes an audit line. It must not break uploads if IVS is down.
 
 ## What you do next (your side only)
 
@@ -34,7 +34,7 @@ INTEGRITY_SHARED_TOKEN=agree-a-demo-secret
 
 - Do not implement signature crypto or DICOM logic in `doc_router`.
 - Do not share a database with Alessa.
-- Do not block her milestones waiting on nginx/credits — contract is enough.
+- Do not block her milestones waiting on nginx/credits, contract is enough.
 
 ## Quick test of the stub
 

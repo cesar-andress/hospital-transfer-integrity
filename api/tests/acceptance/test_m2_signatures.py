@@ -1,4 +1,4 @@
-"""M2 — cryptographic signatures (Ed25519 or similar).
+"""M2: cryptographic signatures (Ed25519 or similar).
 
 TODO(m2): implement signing on baseline register and signature checks on verify.
 Remove every TODO(m2) and xfail when green.
