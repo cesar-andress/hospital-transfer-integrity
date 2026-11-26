@@ -17,7 +17,7 @@ Students fork this repo and open PRs into `main`. Legacy personal repos remain h
 - Daniel scope: [`docs/project/DANIEL_SCOPE.md`](docs/project/DANIEL_SCOPE.md)
 - Alessa scope: [`docs/project/ALESSA_SCOPE.md`](docs/project/ALESSA_SCOPE.md)
 - HTTP contract: [`docs/contract/`](docs/contract/)
-- Calendar: [`docs/ROADMAP.md`](docs/ROADMAP.md) (MVP 2026-12-19, complete 2027-05-15)
+- Calendar: [`docs/ROADMAP.md`](docs/ROADMAP.md) (MVP **2026-12-31**, Depth **2027-02-28**, Complete **2027-05-31**)
 - PR process: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 ```text

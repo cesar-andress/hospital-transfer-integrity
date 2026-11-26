@@ -8,11 +8,11 @@ Daniel's issues (D1 to D8): [`DANIEL_SCOPE.md`](DANIEL_SCOPE.md) (R01–R26).
 Alessa's issues (A1 to A7): [`ALESSA_SCOPE.md`](ALESSA_SCOPE.md) (M0–M5 + proposal).  
 Day-one commands: [`../GETTING_STARTED.md`](../GETTING_STARTED.md).
 
-## Milestone: MVP, December 2026 (due 2026-12-19)
+## Milestone: MVP (due 2026-12-31)
 
 ### D1: Path guards for tenant storage (upload and OTP download)
 
-Assignee: Daniel. Labels: `track:saas`, `mvp`. Due 2026-12-02.
+Assignee: Daniel. Labels: `track:saas`, `mvp`. First deliverable inside MVP (before 2026-12-31).
 
 Requirements R07 and R11 (path part). Spec: `saas/docs/SPEC.md`, R1 and R4.
 
@@ -96,7 +96,7 @@ Assignees: Daniel and Alessa. Labels: `boundary`, `track:joint`, `mvp`.
 
 Each student reads `docs/architecture/BOUNDARY.md` and `docs/contract/` and comments "ACK" on the issue. No code.
 
-## Milestone: Depth, February 2027 (due 2027-02-27)
+## Milestone: Depth (due 2027-02-28)
 
 ### D4: Credit ledger, debit on upload and download (PR4)
 
@@ -162,7 +162,7 @@ Assignees: Daniel and Alessa. Labels: `boundary`, `track:joint`.
 
 Propose one additive field under `object.clinical`, bump the patch version if needed, both sides green.
 
-## Milestone: Complete, May 2027 (due 2027-05-15)
+## Milestone: Complete (due 2027-05-31)
 
 ### D7: Real Linux VM per tenant, or a documented limit (PR7)
 

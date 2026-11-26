@@ -1,44 +1,45 @@
 # Roadmap: ambitious, shared calendar
 
-| Gate | Date | Meaning |
-|------|------|---------|
-| MVP | 2026-12-19 (Friday, Europe/Madrid) | Joint demo-able vertical slice |
-| Mid checkpoint | 2027-02-27 | Depth: security + clinical realism |
-| Complete | 2027-05-15 | Thesis-ready systems + evaluation |
+Dates match the GitHub milestones on `cesar-andress/hospital-transfer-integrity`.
 
-Milestones on GitHub mirror these gates. Issues are intentionally ambitious; cut scope only with tutor ACK.
+| Gate | Due (Europe/Madrid EoD) | Meaning |
+|------|-------------------------|---------|
+| **MVP** | **2026-12-31** | Joint demo-able vertical slice |
+| **Depth** | **2027-02-28** | Security + clinical realism |
+| **Complete** | **2027-05-31** | Thesis-ready systems + evaluation |
 
-## MVP (December 2026): must show
+Issues are intentionally ambitious; cut scope only with tutor ACK.
 
-Daniel (`saas/`)
+## MVP (due 2026-12-31): must show
 
-- Path guards green by 2026-12-02 (all `TODO(path-guards)` gone).
-- `vms` table, `max_accounts` and user invites (PR3 in `saas/README.md`).
-- Upload, soft-call IVS baseline, OTP download still works.
-- Tenant isolation acceptance suite mostly green (no Host/credits stretch yet if marked later).
+**Daniel (`saas/`)**
 
-Alessa (`api/`)
+- Path guards green (all `TODO(path-guards)` gone) — first PR inside this milestone.
+- `vms` table, `max_accounts` and user invites.
+- Upload soft-calls IVS baseline; OTP download still works.
 
-- M0/M1 productionized: durable store (not only memory), health, baselines, verify, basic reports.
+**Alessa (`api/`)**
+
+- Durable store (not only memory), health, baselines, verify, basic reports.
 - Compose-ready image; Daniel points `INTEGRITY_API_BASE_URL` at `api/`.
 - Contract tests green at `0.1.0`.
 
-Together
+**Together**
 
-- One scripted happy path: upload clinical stand-in, baseline id stored, mutate file in a drill, verify, `altered` or `intact` shown in SaaS audit / IVS report.
+- Scripted happy path: upload → baseline → mutate → verify (`intact` / `altered`).
 
-## February 2027: depth
+## Depth (due 2027-02-28)
 
-Daniel: credits on download; password hashing + webhook HMAC; OTP lockout; Host-based tenant routing started.
+**Daniel:** credits on download; password hashing + webhook HMAC; OTP lockout; Host-based tenant routing started.
 
-Alessa: M2 signatures (e.g. Ed25519); M3 synthetic EHR + imaging cases + attack harness; first metrics table; SIEM-shaped event draft.
+**Alessa:** M2 signatures (e.g. Ed25519); M3 synthetic EHR + imaging + attack harness; first metrics table; SIEM-shaped event draft.
 
-## May 2027: complete
+## Complete (due 2027-05-31)
 
-Daniel: Host routing solid; storage abstraction toward real Linux VM (or honest documented limit); full security hardening; polished demo.
+**Daniel:** Host routing solid; storage abstraction toward real Linux VM (or honest documented limit); full security hardening; polished demo.
 
-Alessa: M4 metrics + SIEM export + regulatory note; M5 joint demo polished; insider-modification secondary case; thesis evaluation corpus reproducible.
+**Alessa:** M4 metrics + SIEM export + regulatory note; insider-modification secondary case; joint demo polished; evaluation corpus reproducible.
 
 ---
 
-See issue labels `track:saas`, `track:api`, `track:joint`, `boundary`.
+Labels: `track:saas`, `track:api`, `track:joint`, `boundary`.

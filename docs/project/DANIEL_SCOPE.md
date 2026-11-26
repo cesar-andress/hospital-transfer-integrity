@@ -26,7 +26,7 @@ This file is the **checklist against which the TFG is judged**. If it is not her
 
 | Issue | Milestone | Covers | Acceptance gate |
 |-------|-----------|--------|-----------------|
-| **D1** Path guards | MVP (due 2026-12-02 inside MVP) | R07, R11 path part | No `TODO(path-guards)`; listed tests green |
+| **D1** Path guards | MVP (due 2026-12-31; ship first) | R07, R11 path part | No `TODO(path-guards)`; listed tests green |
 | **D2** Wire SaaS → monorepo `api/` | MVP | Joint hook | Compose/`INTEGRITY_API_BASE_URL`; soft-fail preserved |
 | **D3** `vms` + invites + `max_accounts` | MVP | R04 table, R05, R06 | `test_tenancy_model` invite/max xfails green |
 | **D4** Credit ledger | Depth | R03 ledger, R12–R15 | `test_credits.py` xfails green |

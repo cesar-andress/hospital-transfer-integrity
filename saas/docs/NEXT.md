@@ -13,7 +13,7 @@ Details: [`SPEC.md`](SPEC.md), acceptance `xfail`s under `backend/tests/acceptan
 | Field | Value |
 |-------|--------|
 | Issue | Path guards for tenant VM storage (upload + OTP download) |
-| Deadline | URGENT, Wednesday 2026-12-02 (EoD, Europe/Madrid) |
+| Deadline | Inside MVP milestone **2026-12-31** (ship D1 first) |
 | Paste text | Local only (tutor keeps issue/PR body outside the repo) |
 
 ### Scope (must ship in one PR)
