@@ -1,6 +1,12 @@
 # Next steps (for Daniel)
 
-Planning after PRs #1-#5 are on `main`. Details: [`SPEC.md`](SPEC.md), acceptance `xfail`s under `backend/tests/acceptance/`, integrity track in [`integration/`](integration/OVERVIEW.md).
+You work in the monorepo package `saas/` under `cesar-andress/hospital-transfer-integrity` (fork + PRs to `main`).
+
+**Full scope map (R01–R26 → issues D1–D8, plus Deferred):** [`../../docs/project/DANIEL_SCOPE.md`](../../docs/project/DANIEL_SCOPE.md).  
+Issue texts: [`../../docs/project/ISSUES.md`](../../docs/project/ISSUES.md).  
+Boundary with Alessa: [`../../docs/architecture/BOUNDARY.md`](../../docs/architecture/BOUNDARY.md).
+
+Details: [`SPEC.md`](SPEC.md), acceptance `xfail`s under `backend/tests/acceptance/`, integrity hook in [`integration/`](integration/OVERVIEW.md).
 
 ## Current milestone
 

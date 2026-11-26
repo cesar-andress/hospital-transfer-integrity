@@ -4,7 +4,8 @@ One section per GitHub issue. Assign after the collaborators accept the invite.
 
 Labels: `track:saas`, `track:api`, `track:joint`, `boundary`, `mvp`, `ambitious`.
 
-Daniel's issues (D1 to D8) follow the PR plan already agreed in `saas/README.md` (PR3 to PR7) and `saas/docs/NEXT.md`, and the requirement ids (R01 to R26) of the requirements matrix in `saas/README.md`.
+Daniel's issues (D1 to D8) follow the PR plan in `saas/README.md` (PR3 to PR7), `saas/docs/NEXT.md`, and requirements R01–R26.
+**Full coverage map (nothing implicit):** [`DANIEL_SCOPE.md`](DANIEL_SCOPE.md).
 
 ## Milestone: MVP, December 2026 (due 2026-12-19)
 
@@ -101,14 +102,19 @@ nginx wildcard `<tenant>.app.saas.local` that passes the tenant to the API; logi
 
 ### D6: Security hardening (PR6)
 
-Assignee: Daniel. Labels: `track:saas`.
+Assignee: Daniel. Labels: `track:saas`, `ambitious`.
 
-Requirements R02, R11 (attempts), R17, R18, R19 and R20.
+Requirements R02 (HMAC), R11 (attempts), R17, R18, R19, R20. Also the OTP hash / single-use / Host-bound link xfails in `test_otp_download.py` (not the path-guard ones — those are D1).
 
-- Hashed passwords; no password in clear in the DB or in mails; activation without a clear password.
-- WooCommerce webhook signed with HMAC and checked.
-- OTP lockout after N failed attempts, single-use links.
-- SuperAdmin not hard-coded.
+Scope:
+
+1. Passwords hashed at rest; login uses the hash; seed/demo updated.
+2. Activation mail: no cleartext password (one-time set-password link or equivalent).
+3. WooCommerce webhook verifies `X-WC-Webhook-Signature` (HMAC); reject bad signatures.
+4. OTP: lockout after N failed attempts; store hash not cleartext; single-use (or configurable max downloads); bind redemption to tenant Host where routing exists.
+5. SuperAdmin not hard-coded in source (env/config).
+
+Done when the matching xfails in `test_tenancy_model.py` and `test_otp_download.py` (non path-guard) go green and are unmarked. Out of scope: Alessa IVS, real Linux VM, credit ledger (D4), path guards (D1).
 
 ### A3: M2 signatures on baselines
 
@@ -141,6 +147,14 @@ Requirement R24. Needs a storage abstraction (`app.storage`) so the folder can b
 ### D8: Final security review and demo polish
 
 Assignee: Daniel. Labels: `track:saas`.
+
+Checklist:
+
+1. Walk R01–R24 in `saas/README.md` and mark each Done / Deferred with evidence (PR or test name).
+2. Confirm R25/R26 stay Deferred (out of TFG).
+3. Demo runbook for the SaaS half of J3 (provision, upload, OTP, credits, Host if D5 landed).
+4. No secrets in git; `.env.example` complete for every flag you introduced.
+5. Short note in `saas/README.md` timeline: what shipped vs honest limits (especially if D7 is documentation-only).
 
 ### A6: M4 SIEM-style export and regulatory note
 
